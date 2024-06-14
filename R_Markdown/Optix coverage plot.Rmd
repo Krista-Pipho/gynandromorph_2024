@@ -1,0 +1,75 @@
+---
+title: "Line Coverage Plot @ Pattern Loci, Shriya Code first try"
+author: "Daniel and Krista"
+date: "2024-06-11"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(rtracklayer)
+library(gridExtra)
+library(tidyverse)
+library(grid)
+library(ggthemes)
+```
+
+```{r}
+
+```
+
+```{r}
+ZCovPlot = function(file) {
+    Sys.setlocale(locale="C")
+    bw=import.bw(file)
+    bw_df=as.data.frame(bw)
+
+    desired_seq_name="Hmel218003o"
+    filtered_bw_df=bw_df %>%
+        filter(seqnames == desired_seq_name, start >=701300, end <=706000)
+
+    
+
+    return(filtered_bw_df)
+}
+
+```
+
+```{r}
+L2=ZCovPlot("C:/Users/danie/OneDrive/Documents/Wray_Lab/TN2L_S1.dedup.bw")
+R2=ZCovPlot("C:/Users/danie/OneDrive/Documents/Wray_Lab/TN2R_S2.dedup.bw")
+L3=ZCovPlot("C:/Users/danie/OneDrive/Documents/Wray_Lab/TN3L_S3.dedup.bw")
+R3=ZCovPlot("C:/Users/danie/OneDrive/Documents/Wray_Lab/TN3R_S4.dedup.bw")
+```
+
+```{r}
+max_start=max(L2$start)
+max_score=max(L2$score)
+plot=ggplot(L2, aes(x=start, y=log(score)))+
+    geom_line(color="darkmagenta", size=1)+
+    geom_line(data=L2, color="blue", size=1)+
+    geom_line(data=R2, color="red", size=1)+
+    geom_line(data=L3, color="forestgreen", size=1)+
+    geom_line(data=R3, color="orange", size=1)+
+    ggtitle(paste("TN2L", " Optix Coverage Plot"))+
+  theme_base() + 
+    theme(
+        plot.title=element_text(hjust=0.5, size=8),
+        axis.title.x = element_blank(),
+        axis.title.y = element_blank()
+    )
+plot
+```
+
+```{r}
+combined_grid=grid.arrange(
+    arrangeGrob(L2, R2, L3, R3, ncol = 1),
+    bottom = textGrob("Genomic Position", gp = gpar(fontsize = 8)),
+    left = textGrob("Coverage Score (Log)", rot = 90, gp = gpar(fontsize = 8))
+)
+```
+
+
