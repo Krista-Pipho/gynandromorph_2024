@@ -1,0 +1,6 @@
+BWA 0.7.17
+samtools 1.9
+bwa index Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
+samtools faidx Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa
+bwa mem -M -t 32 Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa 202404_gynandromorph_ngs/TN2L_S1_L001_R1_001.fastq.gz 202404_gynandromorph_ngs/TN2L_S1_L001_R2_001.fastq.gz | samtools sort -@32 -o TN2L_S1.bam
+samtools index TN2L_S1.bam -@32
