@@ -12,10 +12,6 @@ java -jar -Xmx7g /hpc/group/wraylab/kp275/team_heliconius/picard.jar MarkDuplica
 
 file="${sample}.dedup.bam"
 
-if [ ! -f "$file" ]; then
-    echo "Output file not found: $file"
-    exit 1
-fi
 
 echo "Output file: $file"
 
