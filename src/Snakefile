@@ -1,0 +1,63 @@
+all_legs=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
+
+rule targets:
+	input:
+		expand("{leg}.bam",leg=all_legs),
+		expand("{leg}.dedup.bam", leg=all_legs),
+		"coverage_plot.png"
+
+rule bwa_align:
+	input:
+		r1="{leg}_L001_R1_001.fastq.gz",
+		r2="{leg}_L001_R2_001.fastq.gz",
+		reference="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa"
+	output:
+		"{leg}.bam"
+	shell:
+		"""
+		sbatch alignment.sh {input.reference} {input.r1} {input.r2} {wildcards.leg}
+		"""
+
+rule alignment_qc:
+	input:
+		"{leg}.bam"
+	output:
+		"{leg}.dedup.bam"
+	shell:
+		"""
+		sbatch qc_alignment.sh "{wildcards.leg}.bam"
+		"""
+
+rule plot_coverage:
+	input:
+		expand("{leg}.bam", leg=["TN2L_S1", "TN2R_S2", "TN3L_S3", "TN3R_S4"])
+	output:
+		"coverage_plot.png"
+	shell:
+		"""
+		input_list= {" ".join(input)}
+        	sbatch plot_cov.sh $input_list
+		"""	
+
+rule variant_calling:
+	input:
+		script="variant_calling.sh",
+		bam_files=expand("aligned/{leg}.bam",leg=all_legs),
+		genome="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fasta"
+	output:
+		"variants/all.vcf"
+	shell:
+		"""
+		{input.script}
+		"""
+
+rule variant_qc:
+	input:
+		script="qc_snp.sh",
+		archive="variants/all.vcf"
+	output:
+		"qc/snp_calling.txt"
+	shell:
+		"""
+		{input.script}
+		"""
