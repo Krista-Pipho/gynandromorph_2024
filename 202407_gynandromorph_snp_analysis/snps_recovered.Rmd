@@ -1,0 +1,142 @@
+---
+title: "snps"
+author: "Krista Pipho"
+date: "2024-07-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r Packages, message=FALSE}
+library(tidyverse)
+library(pheatmap) # Plotting Heatmap 
+```
+
+
+
+```{r, Load-Data}
+# Read in variants file
+input <- read.csv("new_color_regions.tsv",sep="\t", header=TRUE) #%>% unite("SNP", CHROM:POS, sep = ":", remove = TRUE, na.rm = FALSE) 
+
+# Keep only SNPS (not indels or mixed)
+snps <- input %>% filter(grepl("SNP",input$TYPE)) 
+
+# Keep only INDELS (not snps or mixed)
+indels <- input %>% filter(grepl("INDEL",input$TYPE)) 
+
+# Keep only INDELS (not snps or mixed)
+mixed <- input %>% filter(grepl("MIXED",input$TYPE)) 
+
+```
+
+```{r, Filter-Data}
+
+genotypes <- c("TN2L_S1","TN2R_S2","TN3L_S3","TN3R_S4") # Defines the genotype columns
+type_summary <- input %>% count(TYPE) # Summarizes variant types
+colnames(type_summary) <- c("Type", "Total")
+
+
+# Remove entries with missing genotypes
+
+snps[genotypes] <- lapply(snps[genotypes], gsub, pattern = ".", replacement = "missing", fixed = TRUE)
+filtered_snps <- snps %>% filter(!if_any(everything(), ~ grepl("missing", .)))
+
+indels[genotypes] <- lapply(indels[genotypes], gsub, pattern = ".", replacement = "missing", fixed = TRUE)
+filtered_indels <- indels %>% filter(!if_any(everything(), ~ grepl("missing", .)))
+
+mixed[genotypes] <- lapply(mixed[genotypes], gsub, pattern = ".", replacement = "missing", fixed = TRUE)
+filtered_mixed <- mixed %>% filter(!if_any(everything(), ~ grepl("missing", .)))
+
+complete <- as_data_frame(rbind(c("INDEL", dim(filtered_indels)[1]), c("SNP",dim(filtered_snps)[1]), c("MIXED", dim(filtered_mixed)[1])))
+colnames(complete) <- c("Type", "Complete")
+type_summary <- left_join(type_summary, complete, by = "Type")
+
+
+# Remove fixed differences from the reference
+
+filtered_variable_snps <- filtered_snps %>% filter(!grepl("8",filtered_snps$AC)) 
+filtered_variable_indels <- filtered_indels %>% filter(!grepl("8",filtered_indels$AC)) 
+filtered_variable_mixed <- filtered_mixed %>% filter(!grepl("8",filtered_mixed$AC)) 
+
+variable <- as_data_frame(rbind(c("INDEL", dim(filtered_variable_indels)[1]), c("SNP",dim(filtered_variable_snps)[1]), c("MIXED", dim(filtered_variable_mixed)[1])))
+colnames(variable) <- c("Type", "Variable")
+type_summary <- left_join(type_summary, variable, by = "Type")
+
+
+# Remove entries with multiple alternative alleles
+
+mono_allelic_snps <- filtered_variable_snps %>% filter(!grepl(",",ALT))
+mono_allelic_indels <- filtered_variable_indels %>% filter(!grepl(",",ALT))
+mono_allelic_mixed <- filtered_variable_mixed %>% filter(!grepl(",",ALT))
+
+mono_allelic <- as_data_frame(rbind(c("INDEL", dim(mono_allelic_indels)[1]), c("SNP",dim(mono_allelic_snps)[1]), c("MIXED", dim(mono_allelic_mixed)[1])))
+colnames(mono_allelic) <- c("Type", "Mono-allelic")
+left_join(type_summary, mono_allelic, by = "Type")
+
+```
+
+```{r, SNP-Genotypes-Numeric}
+### Change genotype from characters to numeric form###
+
+mut <- mono_allelic_snps
+mut[] <- lapply(mut, gsub, pattern = "/", replacement = "", fixed = TRUE)
+mut[] <- lapply(mut, gsub, pattern = "|", replacement = "", fixed = TRUE)
+head(mut)
+
+
+mut <- mut %>% rowwise() %>% mutate(TN2L_S1 = str_replace_all(TN2L_S1, REF, "0"))
+mut <- mut %>% rowwise() %>% mutate(TN2L_S1 = str_replace_all(TN2L_S1, ALT, "1"))
+mut <- mut %>% rowwise() %>% mutate(TN2R_S2 = str_replace_all(TN2R_S2, REF, "0"))
+mut <- mut %>% rowwise() %>% mutate(TN2R_S2 = str_replace_all(TN2R_S2, ALT, "1"))
+mut <- mut %>% rowwise() %>% mutate(TN3L_S3 = str_replace_all(TN3L_S3, REF, "0"))
+mut <- mut %>% rowwise() %>% mutate(TN3L_S3 = str_replace_all(TN3L_S3, ALT, "1"))
+mut <- mut %>% rowwise() %>% mutate(TN3R_S4 = str_replace_all(TN3R_S4, REF, "0"))
+mut <- mut %>% rowwise() %>% mutate(TN3R_S4 = str_replace_all(TN3R_S4, ALT, "1"))
+
+genotypes <- c("TN2L_S1","TN2R_S2","TN3L_S3","TN3R_S4")
+mut[genotypes] <- lapply(mut[genotypes], gsub, pattern = "00", replacement = "0", fixed = TRUE)
+mut[genotypes] <- lapply(mut[genotypes], gsub, pattern = "01", replacement = "1", fixed = TRUE)
+mut[genotypes] <- lapply(mut[genotypes], gsub, pattern = "11", replacement = "2", fixed = TRUE)
+mut
+```
+
+
+```{r, Generate-Plot}
+
+Chr <- "210001o"
+Start <- 3300023
+End <- 3373587
+
+
+# Select SNPS of interest 
+interest <- mut %>% filter(grepl(Chr,CHROM)) %>% filter(POS > Start) %>% filter(POS < End)
+
+
+#ggplot(interest, aes(x=POS)) + geom_histogram(bins=100)
+
+# Make numeric columns numeric type
+interest$POS <- as.numeric(as.character(interest$POS))
+interest$TN2L_S1 <- as.numeric(as.character(interest$TN2L_S1))
+interest$TN2R_S2 <- as.numeric(as.character(interest$TN2R_S2))
+interest$TN3L_S3 <- as.numeric(as.character(interest$TN3L_S3))
+interest$TN3R_S4 <- as.numeric(as.character(interest$TN3R_S4))
+
+# Group by genomic windows of 100bp and count snps
+interest$cut <- cut(interest$POS, breaks = seq(Start,End,100), labels=1:((End-Start)/100))
+
+density <- interest %>% group_by(cut, .drop = FALSE) %>% summarise(TN2L = sum(TN2L_S1), TN2R = sum(TN2R_S2), TN3L = sum(TN3L_S3), TN3R = sum(TN3R_S4)) %>%  select(!cut) %>%  as.matrix() %>% t()
+
+```
+
+
+```{r, fig.width=12.5, fig.height=2.25}
+
+library(viridis)
+
+# Plot heatmap of snp density in each leg
+pheatmap::pheatmap(density, cluster_cols = FALSE, color=viridis(10))
+
+```
+
