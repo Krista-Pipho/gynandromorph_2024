@@ -1,0 +1,17 @@
+---
+title: "Citations"
+output: html_document
+date: "2024-09-24"
+bibliography: citations.bib 
+link-citations: TRUE
+---
+```{r}
+
+```
+@Zalokar1980
+![BUTTERFLY](images\Heliconius_burneyi_catharinae_MHNT_dos.jpg)
+<div id="refs"></div>
+```{r Session Information}
+sessionInfo()
+```
+
