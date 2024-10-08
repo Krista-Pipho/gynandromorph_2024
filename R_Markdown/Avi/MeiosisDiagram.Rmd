@@ -1,0 +1,14 @@
+---
+title: Bibliography
+bibliography: Citations.bib
+link-citations: TRUE
+---
+
+Sources: @Bogdanov2016, @Boman2024, @Cabral2014, and @Li2020
+![Butterfly](Images/meiosis.png)
+
+<div id="refs"></div>
+
+```{r Session Information}
+sessionInfo()
+```
