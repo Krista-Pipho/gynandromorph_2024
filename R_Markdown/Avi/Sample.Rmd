@@ -1,0 +1,14 @@
+---
+title: Bibliography
+bibliography: Citations.bib
+link-citations: TRUE
+---
+
+Found at @Fusco2023
+![Butterfly](Images/download.png)
+
+<div id="refs"></div>
+
+```{r Session Information}
+sessionInfo()
+```
