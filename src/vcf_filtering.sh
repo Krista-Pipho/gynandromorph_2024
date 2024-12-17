@@ -1,9 +1,7 @@
 #!/bin/sh
-#SBATCH --mem=32G
-#SBATCH --partition scavenger
 
 input_vcf=$1
-output_file="/work/sm997/gynandromorph_2024/src/filtered_vcfs/filtered_${input_vcf##*/}.vcf"
+output_file="filtered_${input_vcf##*/}.vcf"
 echo filtering $input_vcf ...
 
 module load VCFtools/0.1.17

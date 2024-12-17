@@ -1,63 +1,74 @@
-all_legs=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
+all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
+reference="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa"
 
 rule targets:
 	input:
-		expand("{leg}.bam",leg=all_legs),
-		expand("{leg}.dedup.bam", leg=all_legs),
-		"coverage_plot.png"
+		expand("{sample}.bam",sample=all_samples),
+		expand("{sample}.dedup.bam",sample=all_samples),
+		"coverage_plot.png",
+		expand("{sample}_spark.g.vcf.gz", sample=all_samples),
+		"genotyped_cohort.vcf.gz"
+
+rule prep_ref:
+	input:
+		"{reference}"
+	output:
+		support = "{reference}.pac"
+	shell:
+		"""
+		bash prep_ref.sh {reference}
+		"""
 
 rule bwa_align:
 	input:
-		r1="{leg}_L001_R1_001.fastq.gz",
-		r2="{leg}_L001_R2_001.fastq.gz",
-		reference="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa"
+		r1="{sample}_1.fastq.gz",
+		r2="{sample}_2.fastq.gz",
 	output:
-		"{leg}.bam"
+		"{sample}.bam"
 	shell:
 		"""
-		sbatch alignment.sh {input.reference} {input.r1} {input.r2} {wildcards.leg}
+		bash alignment.sh {reference} {input.r1} {input.r2} {wildcards.sample}
 		"""
 
 rule alignment_qc:
 	input:
-		"{leg}.bam"
+		"{sample}.bam"
 	output:
-		"{leg}.dedup.bam"
+		"{sample}.dedup.bam"
 	shell:
 		"""
-		sbatch qc_alignment.sh "{wildcards.leg}.bam"
+		bash qc_alignment.sh "{wildcards.sample}"
 		"""
+
+bams=" ".join(expand("{sample}.dedup.bam",sample=all_samples))
 
 rule plot_coverage:
 	input:
-		expand("{leg}.bam", leg=["TN2L_S1", "TN2R_S2", "TN3L_S3", "TN3R_S4"])
+		expand("{sample}.dedup.bam",sample=all_samples)	
 	output:
 		"coverage_plot.png"
 	shell:
 		"""
-		input_list= {" ".join(input)}
-        	sbatch plot_cov.sh $input_list
-		"""	
-
-rule variant_calling:
-	input:
-		script="variant_calling.sh",
-		bam_files=expand("aligned/{leg}.bam",leg=all_legs),
-		genome="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fasta"
-	output:
-		"variants/all.vcf"
-	shell:
-		"""
-		{input.script}
+		bash plotcov.sh {bams}
 		"""
 
-rule variant_qc:
+rule per_sample_variant_calling:
 	input:
-		script="qc_snp.sh",
-		archive="variants/all.vcf"
+		"{sample}.dedup.bam"
 	output:
-		"qc/snp_calling.txt"
+		"{sample}_spark.g.vcf.gz"
 	shell:
 		"""
-		{input.script}
+		bash per_sample_variant_calling.sh {wildcards.sample} {reference}
 		"""
+
+gvcfs=" ".join(expand("{sample}",sample=all_samples))
+rule joint_variant_calling:
+	input:
+		expand("{sample}_spark.g.vcf.gz",sample=all_samples)
+	output:
+		"genotyped_cohort.vcf.gz"
+	shell:
+		"""
+		bash joint_variant_calling.sh {gvcfs}
+		""" 
