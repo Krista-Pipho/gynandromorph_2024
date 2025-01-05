@@ -9,3 +9,4 @@ REF=$1
 bwa index ${REF}
 samtools faidx ${REF}
 java -jar picard.jar CreateSequenceDictionary -R ${REF} -O ${REF::-3}.dict
+touch ref.prepped
