@@ -1,0 +1,98 @@
+---
+title: "Illumina DNA Pipeline Summary"
+author: "Krista Pipho"
+date: "2024-12-20"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+
+library(tidyverse)
+library(data.table)
+library(karyoploteR)
+```
+
+## Overview
+
+Davey JW, Chouteau M, Barker SL, Maroja L, Baxter SW, Simpson F, Merrill RM, Joron M, Mallet J, Dasmahapatra KK, Jiggins CD. Major Improvements to the Heliconius melpomene Genome Assembly Used to Confirm 10 Chromosome Fusion Events in 6 Million Years of Butterfly Evolution. G3 (Bethesda). 2016 Jan 15;6(3):695-708. doi: 10.1534/g3.115.023655. Erratum in: G3 (Bethesda). 2016 May 03;6(5):1489. doi: 10.1534/g3.116.029256. PMID: 26772750; PMCID: PMC4777131. 
+
+![](rulegraph.png){width="330"}
+
+```{r, echo=TRUE, include=FALSE}
+
+fastq_sizes <- read_delim("fastq_sizes.txt",delim=" ", col_names = FALSE) %>%  select(X10,X5)
+
+names(fastq_sizes) <- c("sample","size")
+
+fastq_sizes <- fastq_sizes %>% mutate(across('sample', str_replace, '_..fastq.gz', '')) %>% 
+                mutate(across('size', str_replace, 'G', ''))
+
+fq_size_summary <- fastq_sizes %>% group_by(sample) %>% summarise(size = sum(as.numeric(size))) %>% 
+                    as.data.frame() %>% mutate(plot = "Amount")
+
+##possibly use wafflechart for bigger number of samples
+```
+
+```{r, fig.height=2, fig.width=12}
+raw_data_size <- ggplot(aes(x=plot, y=size, fill = sample), data = fq_size_summary) +
+  geom_col() +
+  geom_text(aes(label = sample), position = position_stack(vjust = 0.5)) +
+  coord_flip() +
+  theme(legend.position="none", panel.grid.major = element_blank(), panel.grid.minor = element_blank(), panel.background = element_blank(), axis.line.x.bottom=element_line(color="black"), axis.text.y=element_blank(), axis.ticks.y=element_blank(), axis.title.y = element_blank(), axis.text.x = element_text(size = 12), axis.title.x = element_blank()) +  
+  ggtitle("Gigabytes of Raw Data") 
+
+raw_data_size          
+
+```
+
+## Read Mapping
+
+Mapping stats
+
+```{r, fig.width=12, fig.height=4, message=FALSE}
+
+flagstats <- read_tsv("agregate.flagstat", col_names = FALSE)
+
+flagstats$X2 <- factor(flagstats$X2, levels = c("total","mapped", "paired","duplicate"))
+
+# Grouped Barplot
+ggplot(flagstats, aes(fill=X2, y=X3, x=X1)) + 
+    geom_bar(position="dodge", stat="identity") +
+    xlab("Samples") +
+    ylab("Reads") +
+    ggtitle("Statistics for Read Mapping")
+```
+
+Coverage
+
+![](coverage_plot.png)
+
+Insert Size
+
+```{r, message=FALSE}
+#List filenames
+filenames <- list.files(path='.',pattern="*.insert_size_metrics.txt")
+
+#read the files from the list
+all_files <- lapply(filenames, function(i){read_tsv(i, skip = 10)})
+
+#names the list using the basename from `l`
+# this also is the step to manipuly the filesnamaes to whatever you like
+names(all_files) <- filenames %>% str_replace(".insert_size_metrics.txt","") 
+
+#bind the rows from the list togetgher, putting the filenames into the column "id"
+dt <- rbindlist(all_files, idcol = "id" )
+
+dt %>%
+  ggplot( aes(x=insert_size, y=All_Reads.fr_count, group=id, color=id)) +
+    geom_line()
+```
+
+```{r}
+sessionInfo()
+```
+
