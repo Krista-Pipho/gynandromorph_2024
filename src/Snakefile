@@ -1,12 +1,13 @@
-all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4","ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
+all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4","ERR1050958","ERR1050963","ERR1050965","ERR1050967","ERR1050994","ERR1050907","ERR1050909","ERR1050917","ERR1050919","ERR1050923","ERR1051012","ERR1051011"]
 #all_samples=["ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
 reference="Heliconius_melpomene_melpomene_Hmel2.5.scaffolds.fa"
 
 rule targets:
 	input:
 		expand("{sample}.dedup.bam",sample=all_samples),
+		expand("{sample}.flagstat.txt",sample=all_samples),
 		"coverage_plot.png",
-		"genotyped_cohort.vcf.gz",
+		#"genotyped_cohort.vcf.gz",
 		#expand("{sample}_haplotagged_15.bam",sample=all_samples),
 		
 

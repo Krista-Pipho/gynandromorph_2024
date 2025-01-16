@@ -5,4 +5,3 @@
 
 snakemake --rulegraph | dot -Tpng > rulegraph.png
 snakemake
-
