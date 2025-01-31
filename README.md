@@ -16,7 +16,7 @@ To run the pipeline, Miniconda or Anaconda must be installed on your computer. F
 1. Download the Miniconda Installer for your operating system from the official website: [https://docs.anaconda.com/miniconda/install/](https://docs.anaconda.com/miniconda/install/)
 2. Navigate to the bottom of the website until you see the "Quick Command Line Install" section
 3. Follow the steps for your operating system (Windows, macOS, or Linux)
-4. Run 'conda --version' in your terminal to ensure that Miniconda has been installed
+4. Run `conda --version` in your terminal to ensure that Miniconda has been installed
 
 ### Security: SSH key generation and DCC -> Github connection
   
@@ -33,21 +33,21 @@ To run the pipeline, Miniconda or Anaconda must be installed on your computer. F
 
 1. The pipeline is accessible in this [Github repo](https://github.com/Krista-Pipho/gynandromorph_2024.git). The repository contains everything you will need to run the pipeline
 2. Open your terminal window and log into DCC using `$ ssh netid321@dcc-login.oit.duke.edu`
-3. Clone the repository using 'git clone https://github.com/Krista-Pipho/gynandromorph_2024.git'
-4. Once it is fully cloned, enter the repository directory using 'cd gynandromorph_2024'
+3. Clone the repository using `git clone https://github.com/Krista-Pipho/gynandromorph_2024.git`
+4. Once it is fully cloned, enter the repository directory using `cd gynandromorph_2024`
 <br>
 
 ### Creating the Environment
 
 5. The pipeline can only be run inside of an environment that contains all of the necessary packages. The following steps will describe how to implement the environment on your own terminal
-6. The environment will be stored in the src folder. Enter this folder by using 'cd /gynandromorph_2024/src' 
+6. The environment will be stored in the src folder. Enter this folder by using `cd /gynandromorph_2024/src`
 7. Run `$ conda create --name myenv --file illumina_pipeline_environment.txt`
 8. The text file will now contain all of the packages required to run the pipeline
 <br>
 
 ### Activating the Environment
 
-9. Use 'conda activate myenv' to enter the environment
+9. Use `conda activate myenv` to enter the environment
 <br> 
 
 <br> 
