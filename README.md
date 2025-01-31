@@ -31,7 +31,7 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 4. Once it is fully cloned, enter the repository directory using 'cd gynandromorph_2024'
 <br>
 
-###Creating the Environment
+### Creating the Environment
 
 5. The pipeline can only be run inside of an environment that contains all of the necessary packages. The following steps will describe how to implement the environment on your own terminal
 6. The environment will be stored in the src folder. Enter this folder by using 'cd /gynandromorph_2024/src' 
@@ -39,7 +39,7 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 8. The text file will now contain all of the packages required to run the pipeline
 <br>
 
-###Activating the Environment
+### Activating the Environment
 
 9. Use 'conda activate myenv' to enter the environment
 <br> 
