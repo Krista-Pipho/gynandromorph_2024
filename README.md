@@ -13,8 +13,8 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 
 To run the pipeline, Miniconda or Anaconda must be installed on your computer. Follow the steps below:
 
-1. Download the Miniconda Installer for your operating system from the official website: [(https://docs.anaconda.com/miniconda/install/](https://docs.anaconda.com/miniconda/install/)
-2. To do so, navigate to the bottom of the website until you see the "Quick Command Line Install" section
+1. Download the Miniconda Installer for your operating system from the official website: [https://docs.anaconda.com/miniconda/install/](https://docs.anaconda.com/miniconda/install/)
+2. Navigate to the bottom of the website until you see the "Quick Command Line Install" section
 3. Follow the steps for your operating system (Windows, macOS, or Linux)
 4. Run 'conda --version' in your terminal to ensure that Miniconda has been installed
 
