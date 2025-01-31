@@ -18,7 +18,6 @@ This Snakemake pipeline aids in the analysis of NGS data from an H. melpomene gy
 4. "Add SSH Key" and enter the id_rsa.pub file contents into the "Key" field, and "Add Key"
 <br>
 
-## Getting Started
 
 ## Getting Started
 ### Downloading Pipeline
