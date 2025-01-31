@@ -22,7 +22,9 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 
 
 ## Getting Started
+
 ### Cloning the Pipeline
+
 1. The pipeline is accessible in this [Github repo](https://github.com/Krista-Pipho/gynandromorph_2024.git). The repository contains everything you will need to run the pipeline
 2. Open your terminal window and log into DCC using `$ ssh netid321@dcc-login.oit.duke.edu`
 3. Clone the repository using 'git clone https://github.com/Krista-Pipho/gynandromorph_2024.git'
@@ -30,6 +32,7 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 <br>
 
 ###Creating the Environment
+
 5. The pipeline can only be run inside of an environment that contains all of the necessary packages. The following steps will describe how to implement the environment on your own terminal
 6. The environment will be stored in the src folder. Enter this folder by using 'cd /gynandromorph_2024/src' 
 7. Run `$ conda create --name myenv --file illumina_pipeline_environment.txt`
@@ -37,6 +40,7 @@ A more in depth explanation of each step in the pipeline can be found in Rule Ex
 <br>
 
 ###Activating the Environment
+
 9. Use 'conda activate myenv' to enter the environment
 <br> 
 
