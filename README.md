@@ -54,10 +54,14 @@ To run the pipeline, Miniconda or Anaconda must be installed on your computer. F
 **Simple Use Case**
 <br> 
 
-3. Run `$ snakemake --dry-run` to check if workflow is properly defined and estimate amount of needed resources
-    a. The pipeline DAG image (and also any other files) can be pulled from shell to your local computer via `$ scp netid321@dcc-login.oit.duke.edu:/path/to/gynandromorph_2024/src/dag.png /local/path/to/save` on local terminal
-4. If no errors, run `$ sbatch launch.sh` 
+Using the sample butterfly genome given found in /gynandromorph_2024/data/sample_butterfly.fasta, we will go through a sample run of the pipeline and its rules (processes).
+
+1. Run $ snakemake --dry-run to test if workflow is properly installed and estimate the amount of needed resources. This --dry-run flag evaluates the rules without running the actual commands, and also created a DAG image (/gynandromorph_2024/src/dag.png) that shows the workflow of all rules. INSERT IMG
+2. If on a cluster, the pipeline DAG image (and also any other files) can be viewed by pulling the file from shell to your local computer. Enter the terminal on your local computer and use the command `$ scp netid321@dcc-login.oit.duke.edu:/path/to/genome_2024/src/dag.png /local/path/to/save`
+3. If no errors arise with the dry run, run `$ sbatch launch.sh` while inside the src folder. This file is a wrapper to run the Snakemake commands, found in the Snakefile within the src folder.
+4. If on SLURM, run `squeue -u userID` to view the job process.
 5. Open the corresponding slurm log to monitor the live process output
+
 <br> 
 
 **Rule Explanations**
