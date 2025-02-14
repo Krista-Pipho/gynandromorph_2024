@@ -66,7 +66,9 @@ While the pipeline might seem complex, this section will provide a step-by-step 
 
 1. Run `$ snakemake --dry-run` to test if workflow is properly installed and estimate the amount of needed resources. This --dry-run flag evaluates the rules without running the actual commands, and also created a DAG image (/gynandromorph_2024/src/rulegraph.png) that shows the workflow of all rules. 
 
-![Snakemake Rule Graph](./src/rulegraph.png)
+<p align="center">
+  <img src="./src/rulegraph.png" alt="Snakemake Rule Graph">
+</p>
 
 2. If on a cluster, this pipeline DAG image (and also any other files) can be viewed by pulling the file from shell to your local computer. Enter the terminal on your local computer and use the command `$ scp netid321@dcc-login.oit.duke.edu:/path/to/genome_2024/src/rulegraph.png /local/path/to/save`
 3. If no errors arise with the dry run, run `$ sbatch launch.sh` while inside the src folder. This file is a wrapper to run the Snakemake commands, found in the Snakefile within the src folder.
@@ -101,12 +103,13 @@ After prepping the reference sequence, the pipeline executes the following steps
 
 The goal of BWA Align is to index the reference genome, align paired-end reads, and creates BAM files for each of the samples. There will only be two output BAM files for this rule, and their indexes. You should see these files in your src folder after successful completion of this rule:
 
+```
 SRR31620075.bam                                          
 SRR31620075.bam.bai
 SRR31620076.bam                                          
 SRR31620076.bam.bai
+```
 
-<br>
 
 <br>
 
@@ -114,22 +117,27 @@ SRR31620076.bam.bai
 
 The goal of Alignment Quality Control is to removes duplicate sequences using the Picard module and to generates stats such as # of reads and read quality. Samtools is used to do a quality check of the deduplicated bam files. Here are the files that should show up for each sibling in your src folder if this rule runs properly:
 
+```
 SRR31620075.bam.bai                                    
 SRR31620075.dedup.bam                                   
 SRR31620075.dedup.bam.bai                                
 SRR31620075.flagstat.txt                               
 SRR31620075.processed.flagstat.txt
+```
 
 And the same files for the second daughter yeast genome:
 
+```
 SRR31620076.bam.bai                                    
 SRR31620076.dedup.bam                                   
 SRR31620076.dedup.bam.bai                                
 SRR31620076.flagstat.txt                               
 SRR31620076.processed.flagstat.txt
+```
 
 Additionally, this rule runs quality control to ensure that the Picard deduplication worked properly. By writing `vim SRR31620076.flagstat.txt` into your terminal, you should be able to see the results of the quality control. Here is what you should see:
 
+```
 4123716 + 0 in total (QC-passed reads + QC-failed reads) 
 12824 + 0 secondary   
 0 + 0 supplementary   
@@ -143,11 +151,10 @@ Additionally, this rule runs quality control to ensure that the Picard deduplica
 14897 + 0 singletons (0.36% : N/A)   
 13166 + 0 with mate mapped to a different chr   
 4297 + 0 with mate mapped to a different chr    (mapQ>=5) 
+```
 
 
 Since the number of duplicates has reduced down to 0, the deduplication rule has worked as intended!
-
-<br>
 
 <br>
 
@@ -162,41 +169,44 @@ If you are having trouble viewing the image on your local device, refer back to 
 
 <br>
 
-<br>
-
 ### Variant Calling
 
 The goal of Variant Calling is to use GATK to locate potential SNPs and generates VCFs for all four legs genomes. This step will generate two types of VCFs: per sample VCFs, and joint called VCFs. During this step, these VCFs will be filtered by removing indels and multiallelic sites. You should see the following files in your src folder after successful completion of this rule:
 
-SRR31620075_spark.g.vcf.gz
-SRR31620075_spark.g.vcf.gz.tbi
-SRR31620076_spark.g.vcf.gz
-SRR31620076_spark.g.vcf.gz.tbi
-cohort.g.vcf.gz
-cohort.g.vcf.gz.tbi
-
+```
+SRR31620075_spark.g.vcf.gz   
+SRR31620075_spark.g.vcf.gz.tbi   
+SRR31620076_spark.g.vcf.gz   
+SRR31620076_spark.g.vcf.gz.tbi   
+cohort.g.vcf.gz   
+cohort.g.vcf.gz.tbi   
+```
 <br>
 
-
-<br>
 
 ### Haplotype Calling
 
 This rule is simply meant to indicate within the BAM files which chromosome each read came from. These are the outputs you should see in your src folder:
 
-SRR31620075_haplotagged.bam
-SRR31620076_haplotagged.bam
+```
+SRR31620075_haplotagged.bam   
+SRR31620076_haplotagged.bam   
+```
 
 <br>
 
 
 And that's it! The pipeline has finished running, and now you should have quality statistics, coverage plots, and VCFs for your sibling samples. Now you are ready to try the pipeline out on your own samples!
 
-# Next Steps: Running Your Own Samples
+## Next Steps: Running Your Own Samples
 
+Now, you can alter the Snakefile to run samples of your choosing. In your src folder, use the line `vim Snakefile` to enter the pipeline code. At the top you should see a list of samples, along with two reference sequences. Comment these out and add your own samples/references. Happy pipeline analysis!
 
-
-
-# Resources
 
 # References
+
+Li H, Handsaker B, Wysoker A, Fennell T, Ruan J, Homer N, Marth G, Abecasis G, Durbin R; 1000 Genome Project Data Processing Subgroup. The Sequence Alignment/Map format and SAMtools. Bioinformatics. 2009 Aug 15;25(16):2078-9. doi: 10.1093/bioinformatics/btp352. Epub 2009 Jun 8. PMID: 19505943; PMCID: PMC2723002.
+
+Mölder, F., Jablonski, K.P., Letcher, B., Hall, M.B., Tomkins-Tinch, C.H., Sochat, V., Forster, J., Lee, S., Twardziok, S.O., Kanitz, A., Wilm, A., Holtgrewe, M., Rahmann, S., Nahnsen, S., Köster, J., 2021. Sustainable data analysis with Snakemake. F1000Res 10, 33.
+
+Poplin R, Ruano-Rubio V, DePristo MA, Fennell TJ, Carneiro MO, Van der Auwera GA, Kling DE, Gauthier LD, Levy-Moonshine A, Roazen D, Shakir K, Thibault J, Chandran S, Whelan C, Lek M, Gabriel S, Daly MJ, Neale B, MacArthur DG, Banks E. (2017). Scaling accurate genetic variant discovery to tens of thousands of samples bioRxiv, 201178. DOI: 10.1101/201178
