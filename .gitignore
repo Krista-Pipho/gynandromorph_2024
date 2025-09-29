@@ -2,3 +2,8 @@
 .Rhistory
 .RData
 .Ruserdata
+*.png
+results/*
+# pixi environments
+.pixi/*
+!.pixi/config.toml

@@ -1,0 +1,114 @@
+all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
+#all_samples=["ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
+reference="hmr.p_ctg.fa"
+
+rule targets:
+	input:
+		expand("{sample}.dedup.bam",sample=all_samples),
+		expand("{sample}.flagstat.txt",sample=all_samples),
+		"coverage_plot.png",
+		#"genotyped_cohort.vcf.gz",
+		#expand("{sample}_haplotagged_15.bam",sample=all_samples),
+		
+
+rule prep_ref:
+	output:
+		"ref.prepped"
+	shell:
+		"""
+		bash prep_ref.sh {reference}
+		"""
+
+rule download_reads:
+	output:
+		"{sample}_1.fastq.gz",
+		"{sample}_2.fastq.gz",
+	shell:
+		"""
+		module load SRA-Toolkit/3.0.0-rhel8
+		fasterq-dump {wildcards.sample}
+		bgzip {wildcards.sample}_1.fastq
+		bgzip {wildcards.sample}_2.fastq
+		"""
+rule bwa_align:
+	input:
+		r1="{sample}_1.fastq.gz",
+		r2="{sample}_2.fastq.gz", 
+		ref="ref.prepped"
+	output:
+		"{sample}.dedup.bam"
+	shell:
+		"""
+		bash alignment.sh {reference} {input.r1} {input.r2} {wildcards.sample}
+		"""
+
+rule alignment_qc:
+	input:
+		"{sample}.dedup.bam"
+	output:
+		"{sample}.flagstat.txt"	
+	shell:
+		"""
+		bash qc_alignment.sh "{wildcards.sample}"
+		"""
+
+bams=" ".join(expand("{sample}.dedup.bam",sample=all_samples))
+
+rule plot_coverage:
+	input:
+		expand("{sample}.dedup.bam",sample=all_samples)	
+	output:
+		"coverage_plot.png"
+	shell:
+		"""
+		plotCoverage -p 32 -b {bams} -o coverage_plot.png
+		"""
+
+rule per_sample_variant_calling:
+	input:
+		"{sample}.dedup.bam"
+	output:
+		"{sample}_spark.g.vcf.gz"
+	shell:
+		"""
+		bash per_sample_variant_calling.sh {wildcards.sample} {reference}
+		"""
+
+gvcfs=" ".join(expand("--variant {sample}_spark.g.vcf.gz",sample=all_samples))
+rule joint_variant_calling:
+	input:
+		expand("{sample}_spark.g.vcf.gz",sample=all_samples)
+	output:
+		"genotyped_cohort.vcf.gz"
+	shell:
+		"""
+		singularity exec docker://broadinstitute/gatk:4.1.3.0 gatk CombineGVCFs \
+		--reference {reference} {gvcfs} -O cohort.g.vcf.gz
+		singularity exec docker://broadinstitute/gatk:4.1.3.0 gatk GenotypeGVCFs \
+		--reference {reference} -V cohort.g.vcf.gz -O genotyped_cohort.vcf.gz
+		""" 
+
+#rule calculate_IBD:
+#	input:
+#		"genotyped_cohort.vcf.gz"
+#	output:
+#		
+
+rule phase_variants:
+	input:
+		combined="genotyped_cohort.vcf.gz"
+	output:
+		"{sample}_haplotagged.bam"	
+	shell:
+		"""
+		bash phase_variants.sh {input.combined} {wildcards.sample} {reference}
+		"""
+rule extract_chr:
+	input:
+		"{sample}_haplotagged.bam"
+	output:
+		"{sample}_haplotagged_15.bam"
+	shell:
+		"""
+		bash extract_15.sh {wildcards.sample}
+		"""
