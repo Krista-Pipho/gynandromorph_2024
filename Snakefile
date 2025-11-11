@@ -1,13 +1,13 @@
 all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
 #all_samples=["ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
-reference="hmr.p_ctg.fa"
+reference="hmr_masked.gfa"
 
 rule targets:
 	input:
 		expand("{sample}.dedup.bam",sample=all_samples),
 		expand("{sample}.flagstat.txt",sample=all_samples),
 		"coverage_plot.png",
-		#"genotyped_cohort.vcf.gz",
+		"genotyped_cohort.vcf.gz",
 		#expand("{sample}_haplotagged_15.bam",sample=all_samples),
 		
 

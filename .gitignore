@@ -1,4 +1,10 @@
 .Rproj.user
+ref.prepped
+metrics.txt
+.snakemake
+*.fastq*
+*.gfa*
+slurm*
 .Rhistory
 .RData
 .Ruserdata
@@ -7,3 +13,4 @@ results/*
 # pixi environments
 .pixi/*
 !.pixi/config.toml
+old/*
