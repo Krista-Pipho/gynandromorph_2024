@@ -4,6 +4,7 @@ REF=$1
 r1=$2
 r2=$3
 sample=$4
+cores=$5
 
 module load BWA/0.7.17
 module load samtools/1.9
@@ -14,7 +15,7 @@ RG="@RG\tID:${sample}\tSM:${sample}\t"
 
 # Aligning reads
 echo "Align sample: $sample"
-bwa mem -M ${REF} ${r1} ${r2} -R ${RG} | samtools sort -o ${sample}.bam
+bwa mem -t ${cores} -M ${REF} ${r1} ${r2} -R ${RG} | samtools sort -o ${sample}.bam
 samtools index ${sample}.bam
 
 # Marking duplicates

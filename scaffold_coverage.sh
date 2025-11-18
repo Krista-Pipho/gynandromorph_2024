@@ -8,13 +8,13 @@
 module load Java/1.8.0_60
 module load samtools/1.9
 
-assembly="hmr"
+assembly="bcov_scaffolded_masked"
 
 if [ ! -d "${assembly}_outputs" ]; then
 			mkdir ${assembly}_outputs
 fi
 
-readarray -t scaffoldArr < ${assembly}.gfa.fai
+readarray -t scaffoldArr < ${assembly}.fasta.fai
 
 #cut is -d delimiter of space, -f 1 is field 1
 scaffoldName=$(echo ${scaffoldArr[$SLURM_ARRAY_TASK_ID]} | cut -d ' ' -f 1)

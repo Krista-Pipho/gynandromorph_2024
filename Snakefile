@@ -1,6 +1,10 @@
-all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
-#all_samples=["ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
-reference="hmr_masked.gfa"
+import os
+import certifi
+os.environ['SSL_CERT_FILE'] = certifi.where()
+
+configfile: "config.yaml"
+all_samples= config["all_samples"]
+reference = config["reference"]
 
 rule targets:
 	input:

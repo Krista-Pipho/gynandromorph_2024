@@ -7,6 +7,9 @@ echo filtering $input_vcf ...
 module load VCFtools/0.1.17
 module load bcftools/1.4
 
+# Generate stats before filtering
+bcftools stats $input_vcf > before_filtering_stats.txt
+
 # Keep only SNPs (remove indels)
 bcftools filter -e 'TYPE!="snp"' $input_vcf > $output_file
 bcftools stats $output_file > filtered_vcf_stats.txt
