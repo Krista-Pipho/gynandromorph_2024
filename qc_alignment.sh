@@ -1,8 +1,6 @@
-#!/bin/sh
+#!/bin/bash
 #SBATCH --mem=16G
 
-module load Java/1.8.0_60
-module load samtools/1.9
 # Get flagstats and create processed summary file
 samtools flagstat ${1}.dedup.bam > ${1}.flagstat.txt
 # Process summary by pulling out four numbers of interest and tagging them with sample of origin and identity of statistic

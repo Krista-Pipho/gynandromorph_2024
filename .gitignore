@@ -3,7 +3,10 @@ ref.prepped
 metrics.txt
 .snakemake
 *.fastq*
+*.fasta*
 *.gfa*
+*.bam*
+*.vcf*
 slurm*
 .Rhistory
 .RData
@@ -12,5 +15,5 @@ slurm*
 results/*
 # pixi environments
 .pixi/*
-!.pixi/config.toml
-old/*
+.pixi/config.toml
+*old*
