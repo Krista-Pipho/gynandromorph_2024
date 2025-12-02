@@ -1,4 +1,16 @@
-.Rproj.user
+analysis/*
+results/*
+.snakemake
+.pixi/*
+*.fastq*
+*.fasta*
+*.gfa*
+*.bam*
+*.vcf*
+slurm*
 .Rhistory
 .RData
 .Ruserdata
+*.png
+*.dict
+*old*

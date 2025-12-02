@@ -1,0 +1,57 @@
+---
+title: "Ideograms"
+author: "Krista Pipho"
+date: "2025-11-24"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, message=FALSE}
+if (!require("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+
+BiocManager::install("karyoploteR")
+library(tidyverse)
+library(karyoploteR)
+
+```
+
+
+Create Karyotype for hmr
+
+```{r}
+custom.genome <- toGRanges(data.frame(chr=c("A", "B"), start=c(1, 1), end=c(100, 200)))
+
+kp <- plotKaryotype(genome = custom.genome)
+
+```
+
+
+
+
+```{r, fig.width=6,fig.height=12}
+#build custom karyotype
+
+hmel2p5_fai <- read_tsv("Hmr.fa.fai", col_names=FALSE, show_col_types = FALSE)
+names(hmel2p5_fai) <- c("chr","end",1,2,3)
+
+hmel2p5_fai <- hmel2p5_fai %>% mutate("start"=1) %>% select(chr,start,end)
+
+
+ibis_file_read <- read_tsv("karyotype_trial", col_names = TRUE, show_col_types = FALSE)
+ibis <- ibis_file_read
+
+
+custom.genome <- toGRanges(data.frame(hmel2p5_fai))
+#custom.cytobands <- toGRanges(data.frame(ibis))
+
+#kp <- plotKaryotype(genome = custom.genome, cytobands = custom.cytobands)
+kp <- plotKaryotype(genome = custom.genome)
+
+```
+
+
+
