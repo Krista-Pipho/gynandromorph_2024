@@ -5,7 +5,7 @@ all_samples: # Sample names, used for naming input and output files
   - "TN3R_S4" 
 #all_samples=["ERR1050907","ERR1050958","ERR1050994","ERR1051012"]
 #all_samples=["TN2L_S1","TN3L_S3","TN2R_S2","TN3R_S4"]
-reference: "hmr_masked.fasta" # Genome assembly to align to
+reference: "hmr_masked" # Genome assembly to align to
 cores: 30 # Number of cores, where required to specify 
 
 # Optional operations to perform

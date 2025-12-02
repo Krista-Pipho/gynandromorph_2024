@@ -1,7 +1,7 @@
-.Rproj.user
-ref.prepped
-metrics.txt
+analysis/*
+results/*
 .snakemake
+.pixi/*
 *.fastq*
 *.fasta*
 *.gfa*
@@ -12,8 +12,5 @@ slurm*
 .RData
 .Ruserdata
 *.png
-results/*
-# pixi environments
-.pixi/*
-.pixi/config.toml
+*.dict
 *old*
