@@ -27,6 +27,9 @@ rule download_reads:
 	output:
 		"{sample}_1.fastq.gz",
 		"{sample}_2.fastq.gz",
+	threads: 6  # Number of CPU cores/threads
+	resources:
+		mem_mb=12000  # RAM in Megabytes (8GB)
 	shell:
 		"""
 		module load SRA-Toolkit/3.0.0-rhel8
@@ -71,6 +74,9 @@ rule plot_coverage:
 rule per_sample_variant_calling:
 	input:
 		"analysis/{reference}/{sample}.dedup.bam"
+	threads: 6  # Number of CPU cores/threads
+	resources:
+		mem_mb=12000  # RAM in Megabytes (8GB)
 	output:
 		"analysis/{reference}/{sample}_spark.g.vcf.gz"
 	shell:
